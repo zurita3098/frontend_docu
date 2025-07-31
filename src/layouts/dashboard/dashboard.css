@@ -1,0 +1,169 @@
+/* dashboard.css */
+
+.dashboard-container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: #1976d2;
+  color: white;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.perfil {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.avatar {
+  font-size: 2rem;
+  margin-right: 10px;
+}
+
+.nombre {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Menú */
+.menu button {
+  display: block;
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: rgba(255,255,255,0.15);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.menu button:hover {
+  background-color: rgba(255,255,255,0.3);
+}
+
+/* Contenido principal */
+.contenido {
+  flex: 1;
+  padding: 32px;
+  background-color: #f5f5f5;
+  overflow-y: auto;
+}
+
+
+.vista-container {
+  max-width: 700px;
+  margin: 0 auto;
+  background-color: white;
+  padding: 24px 32px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.05);
+}
+
+/* Estilos para Crear Solicitud dentro de .vista-container */
+.vista-container form div {
+  margin-bottom: 16px;
+}
+
+.vista-container form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.vista-container form input[type="text"],
+.vista-container form select,
+.vista-container form input[type="file"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.vista-container form input[type="text"]:focus,
+.vista-container form select:focus,
+.vista-container form input[type="file"]:focus {
+  outline: none;
+  border-color: #1976d2;
+}
+
+.vista-container form button[type="submit"] {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.vista-container form button[type="submit"]:hover {
+  background-color: #155a9a;
+}
+
+/* Estilos para la tabla en Ver Solicitudes dentro de .vista-container */
+.vista-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+}
+
+.vista-container thead {
+  background-color: #1976d2;
+  color: white;
+}
+
+.vista-container thead th {
+  padding: 14px 20px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.vista-container tbody tr {
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.2s ease;
+}
+
+.vista-container tbody tr:hover {
+  background-color: #f0f8ff;
+}
+
+.vista-container tbody td {
+  padding: 12px 20px;
+  color: #333;
+}
+
+/* Para estados con colores, es mejor usar clases */
+/* Si no tienes clases, quita esta parte o dímelo para ayudarte con React */
+/* Ejemplo (en React deberías agregar): <td className={`estado ${sol.estado.toLowerCase()}`}> */
+.vista-container tbody td.estado.pendiente {
+  color: #f0ad4e; /* amarillo */
+  font-weight: 700;
+}
+
+.vista-container tbody td.estado.aprobado {
+  color: #5cb85c; /* verde */
+  font-weight: 700;
+}
+
+.vista-container tbody td.estado.rechazado {
+  color: #d9534f; /* rojo */
+  font-weight: 700;
+}
