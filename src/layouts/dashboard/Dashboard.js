@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './dashboard.css';
-
+import {getSolicitudes, saveSolicitud, deleteSolicitud} from '../../api/solicitudes';
 const Dashboard = () => {
   const [vista, setVista] = useState('crear');
 
@@ -10,8 +10,11 @@ const Dashboard = () => {
         return <CrearSolicitud />;
       case 'ver':
         return <VerSolicitudes />;
-      default:
-        return <Bienvenida />;
+      case 'logout':
+      // Eliminar token y redirigir
+      localStorage.removeItem('token');
+      window.location.href = '/login'; // o usa navigate('/login') si estás usando React Router
+      return null;
     }
   };
 
@@ -25,6 +28,7 @@ const Dashboard = () => {
         <nav className="menu">
           <button onClick={() => setVista('crear')}>➕ Crear Solicitud</button>
           <button onClick={() => setVista('ver')}>📄 Ver Solicitudes</button>
+          <button onClick={() => setVista('logout')}> Cerrar Sesión</button>
         </nav>
       </aside>
       <main className="contenido">
@@ -39,6 +43,7 @@ const CrearSolicitud = () => {
     cedula: '',
     telefono: '',
     tipo: '',
+    comentario: '',
     cedulaFoto: null,
   });
 
@@ -51,21 +56,51 @@ const CrearSolicitud = () => {
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('cedula', formulario.cedula);
-    formData.append('telefono', formulario.telefono);
-    formData.append('tipo', formulario.tipo);
-    formData.append('cedulaFoto', formulario.cedulaFoto);
-    console.log('Formulario enviado:', formulario);
-    // Aquí podrías enviar `formData` al backend si lo deseas
-  };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+//   const formData = new FormData();
+//   formData.append('cedula', formulario.cedula);
+//   formData.append('telefono', formulario.telefono);
+//   formData.append('tipo', formulario.tipo);
+//   formData.append('cedulaFoto', formulario.cedulaFoto); // esto debe ser un archivo
+//   formData.append('comentario', formulario.comentario);
+
+  try {
+    console.log(formulario.cedulaFoto)
+    const result = await saveSolicitud(
+      localStorage.getItem('usuario_id'),
+      formulario.cedula,
+      formulario.telefono,
+      formulario.tipo,
+      formulario.comentario,
+      formulario.cedulaFoto,
+      0
+    );
+
+    if (result.status_code == 201) {
+      alert('Solicitud enviada exitosamente');
+      setFormulario({
+        cedula: '',
+        telefono: '',
+        tipo: '',
+        comentario: '',
+        cedulaFoto: null,
+      });
+    } else {
+      console.log(result)
+      alert('Error al enviar la solicitud 1');
+    }
+  } catch (error) {
+    console.error('Error al enviar:', error);
+  }
+};
 
   return (
     <div className="vista-container">
-      <h2>Crear Solicitud</h2>
+      
       <form onSubmit={handleSubmit}>
+        <h2>Crear Solicitud</h2>
         <div>
           <label>Cédula:</label>
           <input
@@ -104,6 +139,17 @@ const CrearSolicitud = () => {
         </div>
 
         <div>
+          <label>Comentario:</label>
+          <input
+            type="text"
+            name= "comentario"
+            value={formulario.comentario}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div>
           <label>Adjuntar foto de cédula:</label>
           <input
             type="file"
@@ -121,9 +167,44 @@ const CrearSolicitud = () => {
 };
 
 const VerSolicitudes = () => {
-  const solicitudes = [
-    { tipo: 'Certificado de bautismo', observacion: 'Necesario para matrimonio', estado: 'Pendiente' },
-  ];
+  const [solicitudes, setSolicitudes] = useState([]);
+
+  const tipoSolicitud = {
+  0: 'Certificado de Nacimiento',
+  1: 'Récord Policivo',
+  2: 'Acta de matrimonio Civil'
+};
+
+ const estados = {
+    0: 'Pendiente',
+    1: 'Aprobada',
+    2: 'Rechazada'
+ }
+
+  useEffect(() => {
+    const fetchSolicitudes = async () => {
+      try {
+        const usuario_id = localStorage.getItem('usuario_id')
+        console.log("usuario")
+        console.log(usuario_id)
+        const data = await getSolicitudes(usuario_id);
+        setSolicitudes(data);
+      } catch (error) {
+        console.error('Error al cargar solicitudes:', error);
+      }
+    };
+
+    fetchSolicitudes();
+  }, []);
+
+  const handleDescargar = (url) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = '';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="vista-container">
@@ -132,23 +213,39 @@ const VerSolicitudes = () => {
         <thead>
           <tr>
             <th>Tipo</th>
-            <th>Observación</th>
+            <th>Comentario</th>
             <th>Estado</th>
+            <th>Observación</th>
+            <th>Documento</th>
           </tr>
         </thead>
         <tbody>
-          {solicitudes.map((sol, idx) => (
+        {solicitudes.length > 0 ? (
+            solicitudes.map((sol, idx) => (
             <tr key={idx}>
-              <td>{sol.tipo}</td>
-              <td>{sol.observacion}</td>
-              <td>{sol.estado}</td>
+                <td>{tipoSolicitud[sol.tipo] ?? sol.tipo}</td>
+                <td>{sol.comentario}</td>
+                <td>{estados[sol.estado] ?? sol.estado}</td>
+                <td>{sol.observacion}</td>
+                <td>
+                {sol.documento_url ? (
+                    <button onClick={() => handleDescargar(sol.documento_url)}>
+                    Descargar
+                    </button>
+                ) : (
+                    'No disponible'
+                )}
+                </td>
             </tr>
-          ))}
+            ))
+        ) : null}
         </tbody>
+
       </table>
     </div>
   );
 };
+
 
 const Bienvenida = () => (
   <div>

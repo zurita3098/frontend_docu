@@ -14,6 +14,7 @@ export async function Loginx(email, password) {
 
     if (response.ok && data.access_token) {
       localStorage.setItem('token', data.access_token);
+      localStorage.setItem('usuario_id', data.usuario_id);
       return data;
     } else {
       throw new Error(data.detail || 'Error al iniciar sesión');
